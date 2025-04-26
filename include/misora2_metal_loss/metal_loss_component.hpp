@@ -29,15 +29,21 @@ class EvaluateMetalLoss : public rclcpp::Node
 public:
     using MyAdaptedType = rclcpp::TypeAdapter<cv::Mat, sensor_msgs::msg::Image>;
 
-    std::string minimal_value;
+    std_msgs::msg::String result_value;
     cv::Mat result_image, receive_image;
 
+    // 最小値の判断
+    std::vector<double> value_list; // (1)関数から返ってきた最小値を格納する配列
+    double minimal_value = std::numeric_limits<double>::max(); // (2)関数から返ってきた値が現在の値より小さいか判別
+
+    cv::Point point;
+    cv::Size size;
     explicit EvaluateMetalLoss(const rclcpp::NodeOptions &options);
     EvaluateMetalLoss() : EvaluateMetalLoss(rclcpp::NodeOptions{}) {}
 
 private:
     void update_image_callback(const std::unique_ptr<cv::Mat> msg);
-
+    // double func(cv::Mat img, cv::Point sp, cv::Size size);
     rclcpp::Subscription<MyAdaptedType>::SharedPtr receive_image_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr minimal_value_publisher_;
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr result_image_publisher_;
