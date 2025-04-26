@@ -38,6 +38,9 @@ void EvaluateMetalLoss::update_image_callback(const std::unique_ptr<cv::Mat> msg
         // (2)はそのままminimal_valueを送信
         result_value.data = std::to_string(minimal_value);
         minimal_value_publisher_->publish(result_value);
+
+        // value_list.clear();
+        // minimal_value = std::numeric_limits<double>::max();
     }
     else {
         // cv::Mat型のreceive_imageと数値を読み取る領域(sp,size)を入力とした数値読み取り関数 返り値 double型
