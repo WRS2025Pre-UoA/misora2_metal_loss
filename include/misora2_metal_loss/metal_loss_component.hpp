@@ -36,7 +36,7 @@ public:
     std::vector<double> value_list; // (1)関数から返ってきた最小値を格納する配列
     double minimal_value = std::numeric_limits<double>::max(); // (2)関数から返ってきた値が現在の値より小さいか判別
 
-    cv::Point point;
+    cv::Point sp;
     cv::Size size;
     explicit EvaluateMetalLoss(const rclcpp::NodeOptions &options);
     EvaluateMetalLoss() : EvaluateMetalLoss(rclcpp::NodeOptions{}) {}

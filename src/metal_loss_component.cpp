@@ -32,7 +32,7 @@ void EvaluateMetalLoss::update_image_callback(const std::unique_ptr<cv::Mat> msg
     receive_image = std::move(*msg);
 
     RCLCPP_INFO_STREAM(this->get_logger(),"Receive image address: " << &(msg->data));
-    if (cv::countNonZero(image) == 0) {
+    if (cv::countNonZero(receive_image) == 0) {
         // 黒画像が来たら保存している最小値を報告する
         // (1) int minimal_value = *min_element(begin(value_list), end(value_list));
         // (2)はそのままminimal_valueを送信
