@@ -25,29 +25,44 @@ EvaluateMetalLoss::EvaluateMetalLoss(const rclcpp::NodeOptions &options)
     
     // 数値の報告
     minimal_value_publisher_ = this->create_publisher<std_msgs::msg::String>("metal_loss_result_data",10);
-    result_image_publisher_ = this->create_publisher<sensor_msgs::msg::Image>("metal_loss_result_image",10);//不要だったらコメントアウト
+    result_image_publisher_ = this->create_publisher<MyAdaptedType>("metal_loss_result_image",10);//不要だったらコメントアウト
 }   
 
 void EvaluateMetalLoss::update_image_callback(const std::unique_ptr<cv::Mat> msg){
-    receive_image = std::move(*msg);
+    cv::Mat receive_image = std::move(*msg);
 
-    RCLCPP_INFO_STREAM(this->get_logger(),"Receive image address: " << &(msg->data));
-    if (cv::countNonZero(receive_image) == 0) {
-        // 黒画像が来たら保存している最小値を報告する
-        // (1) int minimal_value = *min_element(begin(value_list), end(value_list));
-        // (2)はそのままminimal_valueを送信
-        result_value.data = std::to_string(minimal_value);
-        minimal_value_publisher_->publish(result_value);
+    if (not(receive_image.empty())){
+        if (receive_image.channels() != 1){// カラー画像である
+            // 実装分部
+            // double value = func1(receive_image, sp, size); // 成功：double値　失敗：迷っている
+            // value_list.push_back(value); // 配列に一時保存
+            // if( minimal_value > value ) minimal_value = value; // 最小値をどんどん更新
+            // ---------------------------------------------------
+        }
+        else if(receive_image.channels() == 1){// 黒画像の場合
+            // std_msgs::msg::String msg_S;
+            // double min_value = *min_element(begin(value_list), end(value_list));
+            // msg_S.data = to_string_with_precision(minimal_value,6);
+            // msg_S.data = to_string_with_precision(min_value,6);
+            // minimal_value_publisher_->publish(msg_S);
+            // result_image_publisher_->publish(receive_image);
+            // value_list.clear(); // 送信後初期化
+            // minimal_value = std::numeric_limits<double>::max(); // 送信後初期化
+            // テスト用-------------------------------------------
+            std_msgs::msg::String msg_S;
+            msg_S.data = "0.04";
+            minimal_value_publisher_->publish(msg_S);
+            result_image_publisher_->publish(receive_image);
+            RCLCPP_INFO_STREAM(this->get_logger(),"Publish: "<< receive_image.size() );
+            // ---------------------------------------------------
+        } 
+    }
+}
 
-        // value_list.clear();
-        // minimal_value = std::numeric_limits<double>::max();
-    }
-    else {
-        // cv::Mat型のreceive_imageと数値を読み取る領域(sp,size)を入力とした数値読み取り関数 返り値 double型
-        // double result = func(receive_image,sp,size);
-        // (1)value_list.push_back(result);
-        // (2)if(minimal_value < result) minimal_value = result;
-    }
+std::string EvaluateMetalLoss::to_string_with_precision(double value, int precision = 6) {
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(precision) << value;
+    return out.str();
 }
 
 } //namespace component_metal_loss
