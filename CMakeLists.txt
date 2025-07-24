@@ -21,8 +21,13 @@ find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(TESSERACT REQUIRED tesseract)
+
 include_directories(
   include
+  ${TESSERACT_INCLUDE_DIRS}
+  ${LEPTONICA_INCLUDE_DIRS}
 )
 
 set(dependencies
@@ -33,13 +38,32 @@ set(dependencies
     sensor_msgs
     std_msgs
 )
-
-add_library(metal_loss_library SHARED src/metal_loss_component.cpp)
+# ライブラリ化
+add_library(metal_loss_library SHARED src/metal_loss_component.cpp src/detect.cpp)
 ament_target_dependencies(metal_loss_library ${dependencies})
+target_link_libraries(metal_loss_library
+  ${TESSERACT_LIBRARIES}
+  ${LEPTONICA_LIBRARIES}
+)
 rclcpp_components_register_nodes(metal_loss_library "component_metal_loss::EvaluateMetalLoss")
-
-add_executable(metal_loss_node src/metal_loss_component.cpp src/metal_loss_node.cpp)
+# ノード
+add_executable(metal_loss_node src/metal_loss_component.cpp src/metal_loss_node.cpp src/detect.cpp)
 ament_target_dependencies(metal_loss_node ${dependencies})
+target_link_libraries(metal_loss_node
+  ${TESSERACT_LIBRARIES}
+  ${LEPTONICA_LIBRARIES}
+)
+
+# C++ main関数から実行
+add_executable(metal_loss_detection 
+    src/detect.cpp 
+    src/detect_main.cpp)
+
+target_link_libraries(metal_loss_detection
+    ${OpenCV_LIBS}
+    ${TESSERACT_LIBRARIES}
+    ${LEPTONICA_LIBRARIES}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -57,6 +81,7 @@ install(TARGETS
 
 install(TARGETS
   metal_loss_node
+  metal_loss_detection
   DESTINATION lib/${PROJECT_NAME}
 )
 

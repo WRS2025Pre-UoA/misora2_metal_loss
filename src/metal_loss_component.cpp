@@ -1,5 +1,5 @@
 #include "misora2_metal_loss/metal_loss_component.hpp"
-
+#include "misora2_metal_loss/detect.hpp"
 namespace component_metal_loss
 {
 EvaluateMetalLoss::EvaluateMetalLoss(const rclcpp::NodeOptions &options)
@@ -11,15 +11,13 @@ EvaluateMetalLoss::EvaluateMetalLoss(const rclcpp::NodeOptions &options)
     this->declare_parameter<int>("width",100);
     this->declare_parameter<int>("height",100);
 
-    int x,y,width,height;
+   
     this->get_parameter("x",x);
     this->get_parameter("y",y);
     this->get_parameter("width",width);
-    this->get_parameter("heght",height);
-    // 始点(左隅)からwidth x heightの長方形領域を作成
-    sp = cv::Point(x,y);
-    size = cv::Size(width,height);
+    this->get_parameter("height",height);
 
+    RCLCPP_INFO_STREAM(this->get_logger(),"Set param(Crop Area): " << x << " " << y << " " << width << " " << height);
     // 分配機から画像を受け取る
     receive_image_ = this->create_subscription<MyAdaptedType>("metal_loss_image",10,std::bind(&EvaluateMetalLoss::update_image_callback,this,std::placeholders::_1));
     
@@ -34,9 +32,12 @@ void EvaluateMetalLoss::update_image_callback(const std::unique_ptr<cv::Mat> msg
     if (not(receive_image.empty())){
         if (receive_image.channels() != 1){// カラー画像である
             // 実装分部
-            // double value = func1(receive_image, sp, size); // 成功：double値　失敗：迷っている
+            cv::Mat thresh = Detect::preprocessAndCrop(receive_image,x,y,width,height); // 画像、左上(x,y)、サイズ(w,h)
+            double value = Detect::extractNumberFromImage(thresh);
+        
             // value_list.push_back(value); // 配列に一時保存
             // if( minimal_value > value ) minimal_value = value; // 最小値をどんどん更新
+            RCLCPP_INFO_STREAM(this->get_logger(), "Success read value: " << value);
             // ---------------------------------------------------
         }
         else if(receive_image.channels() == 1){// 黒画像の場合
