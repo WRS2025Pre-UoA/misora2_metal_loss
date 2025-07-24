@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
         // cv::Mat thresh = preprocessAndCrop(image, int(width/4), int(height/3), int(width-width/4), int(height/2)); // IMG_6
         // cv::Mat thresh = preprocessAndCrop(image, int(width/4), int(15), int(width/2-15), int(height/2+15)); // IMG_8
         cv::Mat thresh = Detect::preprocessAndCrop(image, int(width/4), int(height/3+15), int(width/2-15), int(height/3)); // IMG_3
-        std::cout << int(width/4)<<int(height/3+15)<< int(width/2-15) <<  int(height/3) << std::endl;
+        // std::cout << int(width/4)<<int(height/3+15)<< int(width/2-15) <<  int(height/3) << std::endl;
         double number = Detect::extractNumberFromImage(thresh);
         
         std::cout << "🔢 数字抽出結果: " << number << std::endl;

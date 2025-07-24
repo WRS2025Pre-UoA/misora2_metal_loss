@@ -14,8 +14,17 @@ sudo apt upgarde
 ~~~
 
 ## 実行コード
+### ノード単体で実行
 ~~~bash!
 colcon build 
 source install/setup.bash
 ros2 run misora2_metal_loss metal_loss_node
+~~~
+
+### C++プログラム実行
+クロップ範囲は直接プログラム(src/detect_main.cpp)に書き込む
+~~~bash!
+colcon build --symlink-install
+source install/setup.bash
+./build/misora2_metal_loss/metal_loss_detection <画像パス>
 ~~~
