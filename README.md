@@ -26,5 +26,5 @@ ros2 run misora2_metal_loss metal_loss_node
 ~~~bash!
 colcon build --symlink-install
 source install/setup.bash
-./build/misora2_metal_loss/metal_loss_detection <画像パス>
+./build/misora2_metal_loss/metal_loss_detection <画像パス> # src/misora2_metal_loss/test.png
 ~~~

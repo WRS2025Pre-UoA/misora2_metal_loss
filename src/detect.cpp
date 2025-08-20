@@ -17,14 +17,14 @@ cv::Mat Detect::preprocessAndCrop(const cv::Mat& image, int x, int y, int width,
     int roi_height = std::min(height, gray.rows - roi_y);
 
     if (roi_width <= 0 || roi_height <= 0) {
-        std::cerr << "ROIの幅または高さが不正です: "
+        std::cerr << "The width or height of the ROI is incorrect.: "
                 << "width=" << roi_width << ", height=" << roi_height << std::endl;
         // 適宜エラー処理または戻る
     }
 
     cv::Rect roi(roi_x, roi_y, roi_width, roi_height);
     cv::Mat cropped = gray(roi);
-    std::cout << cropped.cols << cropped.rows << std::endl;
+    // std::cout << cropped.cols << cropped.rows << std::endl;
 
     // ぼかし＋しきい値処理
     cv::Mat blurred, thresh;
@@ -39,7 +39,7 @@ double Detect::extractNumberFromImage(const cv::Mat& thresh) {
     tesseract::TessBaseAPI tess;
     double error_value = std::numeric_limits<double>::max();
     if (tess.Init(NULL, "eng", tesseract::OEM_LSTM_ONLY)) {
-        std::cerr << "Tesseract初期化に失敗しました" << std::endl;
+        std::cerr << "Tesseract initialization failed." << std::endl;
         return std::numeric_limits<double>::max();
     }
 
@@ -57,18 +57,18 @@ double Detect::extractNumberFromImage(const cv::Mat& thresh) {
 
         // 「00.49」などの不正フォーマットを検出
         if (std::regex_match(numberStr, std::regex(R"(0\d+\.\d+|0\d+)"))) {
-            std::cerr << "不正な数値形式が検出されました: " << numberStr << std::endl;
+            std::cerr << "An invalid number format was detected.: " << numberStr << std::endl;
             return error_value;
         }
 
         try {
             return std::stod(numberStr);
         } catch (...) {
-            std::cerr << "文字列の変換に失敗しました: " << numberStr << std::endl;
+            std::cerr << "String conversion failed.: " << numberStr << std::endl;
             return error_value;
         }
     }
 
-    std::cerr << "数値が認識できませんでした" << std::endl;
+    std::cerr << "The number could not be recognized." << std::endl;
     return error_value;
 }

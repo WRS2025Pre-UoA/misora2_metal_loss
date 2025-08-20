@@ -1,12 +1,15 @@
 #include "misora2_metal_loss/detect.hpp"
 
 int main(int argc, char *argv[]) {
+    if(argc < 2){
+        std::cout << "Please input file path" << std::endl;
+        return 0;
+    }
     std::string path = argv[1];
     // 画像の読み込み
-    // cv::Mat image = cv::imread("../thicknessImage/IMG_3.png");
     cv::Mat image = cv::imread(path);
     if (image.empty()) {
-        std::cerr << "❌ 画像が読み込めません" << std::endl;
+        std::cerr << "Cannot read image path" << std::endl;
         return -1;
     }
 
@@ -19,7 +22,7 @@ int main(int argc, char *argv[]) {
         // std::cout << int(width/4)<<int(height/3+15)<< int(width/2-15) <<  int(height/3) << std::endl;
         double number = Detect::extractNumberFromImage(thresh);
         
-        std::cout << "🔢 数字抽出結果: " << number << std::endl;
+        std::cout << "Success Result: " << number << std::endl;
 
         // 表示
         cv::imshow("thresh", thresh);
